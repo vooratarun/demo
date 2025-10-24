@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.AddressDTO;
 import com.example.demo.entity.Address;
 import com.example.demo.entity.Customer;
 import com.example.demo.repo.AddressRepository;
@@ -51,5 +52,14 @@ public class AddressController {
                 .orElseThrow(() -> new RuntimeException("Address not found"));
         addressRepository.delete(address);
         return "Address deleted successfully";
+    }
+
+
+    @GetMapping("{customerId}/address-list")
+    public List<AddressDTO> getAllAddressesOfCustomer(@PathVariable Long customerId) {
+        return addressRepository.findAllByCustomerId(customerId)
+                .stream()
+                .map(a -> new AddressDTO(a.getId(), a.getStreet(), a.getCity(), a.getState(), a.getZipcode()))
+                .toList();
     }
 }

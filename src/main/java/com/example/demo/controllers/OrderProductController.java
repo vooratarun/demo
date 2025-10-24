@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.TopProductDTO;
 import com.example.demo.entity.Order;
 import com.example.demo.entity.OrderProduct;
 import com.example.demo.entity.Product;
@@ -11,7 +12,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/order-products")
@@ -81,5 +84,22 @@ public class OrderProductController {
     @GetMapping("/product/{productId}")
     public List<OrderProduct> getOrdersForProduct(@PathVariable Long productId) {
         return orderProductRepository.findByProductId(productId);
+    }
+
+
+    @Operation(summary = "findTopProductsBySales")
+    @GetMapping("/sales")
+    public List<Object> findTopProductsBySales() {
+       // return Collections.singletonList(orderProductRepository.findTopProductsBySales());
+
+        return orderProductRepository.findTopProductsBySales()
+                .stream()
+                .map(result -> {
+                    Object[] row = (Object[]) result;
+                    String productName = ((com.example.demo.entity.Product) row[0]).getName();
+                    Long totalSold = ((Number) row[1]).longValue();
+                    return new TopProductDTO(productName, totalSold);
+                })
+                .collect(Collectors.toList());
     }
 }

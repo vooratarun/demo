@@ -54,4 +54,17 @@ public class ProductController {
         productRepository.delete(product);
         return "Product deleted successfully";
     }
+
+    @Operation(summary = "Get all products of a orderId")
+    @GetMapping("/orders/{orderId}")
+    public List<Product> findProductsByOrderId(@PathVariable Long orderId) {
+        return productRepository.findProductsByOrderId(orderId);
+    }
+
+    @Operation(summary = "getTotalQuantitySold of a product")
+    @GetMapping("/total/{productId}")
+    public Integer getTotalQuantitySold(@PathVariable Long productId){
+        return productRepository.getTotalQuantitySold(productId);
+    }
+
 }

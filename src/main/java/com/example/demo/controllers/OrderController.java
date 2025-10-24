@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.dto.CustomerOrderCountDTO;
 import com.example.demo.entity.Address;
 import com.example.demo.entity.Customer;
 import com.example.demo.entity.Order;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -48,6 +50,7 @@ public class OrderController {
         order.setCustomer(customer);
         order.setAddress(address);
         order.setOrderDate(LocalDateTime.now());
+        orderRepository.save(order);
         return  order;
     }
 
@@ -72,4 +75,41 @@ public class OrderController {
         orderRepository.delete(order);
         return "Order deleted successfully";
     }
+
+    @Operation(summary = "Find orders placed by a specific customer")
+    @GetMapping("/customer/{customerId}")
+    public List<Order> findOrdersByCustomerId(@PathVariable Long customerId) {
+        return orderRepository.findOrdersByCustomerId(customerId);
+    }
+
+    @Operation(summary =  "Find orders by city")
+    @GetMapping("/city/{city}")
+    public List<Order> findOrdersByCity(@PathVariable String city){
+        return  orderRepository.findOrdersByCity(city);
+    }
+
+
+    @Operation(summary =  "fetchOrdersWithCustomerAndAddress")
+    @GetMapping("/customer-address")
+    public List<Order> fetchOrdersWithCustomerAndAddress(){
+        return  orderRepository.fetchOrdersWithCustomerAndAddress();
+    }
+
+
+    @Operation(summary =  "countOrdersPerCustomer")
+    @GetMapping("/count/customer")
+    public List<CustomerOrderCountDTO> countOrdersPerCustomer(){
+
+        return orderRepository.countOrdersPerCustomer()
+                .stream()
+                .map(result -> {
+                    String customerName = (String) result[0];
+                    Long count = ((Number) result[1]).longValue();
+                    return new CustomerOrderCountDTO(customerName, count);
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 }

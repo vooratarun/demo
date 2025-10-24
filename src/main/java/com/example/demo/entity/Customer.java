@@ -1,5 +1,6 @@
 package com.example.demo.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.HashSet;
@@ -18,6 +19,9 @@ public class Customer {
 
     private String email;
 
+    @Column(name = "phone_number", unique = true)
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("customer") // avoid recursion
     private Set<Order> orders = new HashSet<>();
@@ -25,6 +29,7 @@ public class Customer {
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnoreProperties("customer")
+    @JsonIgnore
     private Set<Address> addresses = new HashSet<>();
 
 
@@ -49,4 +54,11 @@ public class Customer {
     public Set<Address> getAddresses() { return addresses; }
     public void setAddresses(Set<Address> addresses) { this.addresses = addresses; }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
 }

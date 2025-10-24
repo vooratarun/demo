@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import com.example.demo.entity.Address;
 import com.example.demo.entity.Customer;
 import com.example.demo.repo.CustomerRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,6 +44,7 @@ public class CustomerController {
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
         customer.setName(updated.getName());
         customer.setEmail(updated.getEmail());
+        customer.setPhoneNumber(updated.getPhoneNumber());
         return customerRepository.save(customer);
     }
 
@@ -54,4 +56,18 @@ public class CustomerController {
         customerRepository.delete(customer);
         return "Customer deleted successfully";
     }
+
+
+
+    @GetMapping("/with-addresses")
+    public List<Customer> getAllCustomersWithAddresses() {
+        return customerRepository.findAllCustomersWithAddresses();
+    }
+
+
+    @GetMapping("/orders")
+    public List<Customer> findCustomersWithOrders() {
+        return customerRepository.findCustomersWithOrders();
+    }
+
 }
