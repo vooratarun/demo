@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,5 +15,11 @@ public class TestController {
     @PostMapping("/echo")
     public String echo(@RequestBody String body) {
         return "Received: " + body;
+    }
+
+
+    @GetMapping("/profile")
+    public String getProfile(HttpServletRequest request) {
+        return "Profile for user: " + request.getAttribute("userId");
     }
 }
