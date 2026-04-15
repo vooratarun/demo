@@ -5,12 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 
 @SpringBootApplication
 @EnableWebSecurity
 @EnableCaching
 @EnableAsync
+@EnableScheduling
 //@ComponentScan(basePackages = {"com.example.demo.controller",
 //        "com.example.demo.services",
 //        "com.example.demo.util"})
@@ -21,5 +23,4 @@ public class DemoApplication {
 	}
 
 }
-
 
