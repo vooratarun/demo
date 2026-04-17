@@ -1,0 +1,60 @@
+type Query {
+    """Get all todos"""
+    todos: [Todo!]!
+
+    """Get a todo by ID"""
+    todo(id: ID!): Todo
+}
+
+type Mutation {
+    """Create a new todo"""
+    createTodo(input: CreateTodoInput!): Todo!
+
+    """Update an existing todo"""
+    updateTodo(id: ID!, input: UpdateTodoInput!): Todo
+
+    """Delete a todo by ID"""
+    deleteTodo(id: ID!): Boolean!
+
+    """Mark a todo as completed"""
+    completeTodo(id: ID!): Todo
+}
+
+type Subscription {
+    """Subscribe to todo updates"""
+    todoCreated: Todo!
+}
+
+type Todo {
+    """Unique identifier for the todo"""
+    id: ID!
+
+    """Title of the todo"""
+    title: String!
+
+    """Description of the todo"""
+    description: String
+
+    """Whether the todo is completed"""
+    completed: Boolean!
+}
+
+input CreateTodoInput {
+    """Title of the todo (required)"""
+    title: String!
+
+    """Description of the todo (optional)"""
+    description: String
+}
+
+input UpdateTodoInput {
+    """Title of the todo"""
+    title: String
+
+    """Description of the todo"""
+    description: String
+
+    """Whether the todo is completed"""
+    completed: Boolean
+}
+

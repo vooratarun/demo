@@ -54,6 +54,7 @@ This is a **multi-layer Spring Boot 3.5.6 application** (Java 17) with:
 | DB Queries | `config/JooqConfig.java` | jOOQ DSLContext configured for MySQL dialect |
 | S3 File Storage | `config/S3Config.java` + `services/S3Service.java` | Upload, download, list, delete files; bucket auto-create on init |
 | KMS Encryption | `config/KmsConfig.java` + `services/KmsService.java` | Encrypt/decrypt data, manage keys, envelope encryption |
+| GraphQL API | `config/GraphQLConfig.java` + `graphql/TodoQueryResolver.java`, `TodoMutationResolver.java` | Query & Mutation resolvers for Todo operations; schema in `/graphql/schema.graphqls` |
 | Interceptors | `interceptor/PerformanceInterceptor.java` | Logs request duration to stdout |
 | Filters | `filter/FirstFilter.java`, `SecondFilter.java` | @Order(1), @Order(2) - run in order before controllers |
 
@@ -66,8 +67,116 @@ This is a **multi-layer Spring Boot 3.5.6 application** (Java 17) with:
 - **KMS** (`config/KmsConfig.java` + `services/KmsService.java`): Encrypt/decrypt data, key management via `/api/kms/*` endpoints
 - **Kafka** (`kafka/`): Producers/consumers for `demo-topic`; idempotent producer enabled
 - **Email/SMS**: `EmailService`, `SMSNotificationService` - abstract `NotificationService` pattern
+- **GraphQL** (`graphql/`): Query/Mutation resolvers for Todo operations; schema-first approach with Spring GraphQL
 
-## S3 File Storage Usage
+## GraphQL Todo API
+
+## GraphQL Todo API
+
+### GraphQL Endpoints
+- **GraphQL API**: `POST /graphql` - Execute queries and mutations
+- **GraphiQL UI**: `GET /graphiql` - Interactive GraphQL IDE for testing
+- **Subscriptions**: `WS /graphql` - WebSocket for real-time updates (configured but not active)
+
+### GraphQL Schema
+The schema is defined in `/src/main/resources/graphql/schema.graphqls`:
+```graphql
+type Query {
+  todos: [Todo!]!
+  todo(id: ID!): Todo
+}
+
+type Mutation {
+  createTodo(input: CreateTodoInput!): Todo!
+  updateTodo(id: ID!, input: UpdateTodoInput!): Todo
+  deleteTodo(id: ID!): Boolean!
+  completeTodo(id: ID!): Todo
+}
+
+type Todo {
+  id: ID!
+  title: String!
+  description: String
+  completed: Boolean!
+}
+```
+
+### Sample Queries & Mutations
+
+**Get All Todos**:
+```graphql
+query {
+  todos {
+    id
+    title
+    description
+    completed
+  }
+}
+```
+
+**Create Todo**:
+```graphql
+mutation {
+  createTodo(input: {
+    title: "Learn GraphQL"
+    description: "Understand GraphQL basics"
+  }) {
+    id
+    title
+    completed
+  }
+}
+```
+
+**Update Todo**:
+```graphql
+mutation {
+  updateTodo(id: "todo-id", input: {
+    title: "Updated title"
+    completed: true
+  }) {
+    id
+    title
+    completed
+  }
+}
+```
+
+### GraphQL Project Structure
+- **Schema**: `/src/main/resources/graphql/schema.graphqls` - Type definitions
+- **Resolvers**: 
+  - `/src/main/java/.../graphql/TodoQueryResolver.java` - @QueryMapping methods
+  - `/src/main/java/.../graphql/TodoMutationResolver.java` - @MutationMapping methods
+- **DTOs**: 
+  - `/src/main/java/.../dto/CreateTodoInput.java`
+  - `/src/main/java/.../dto/UpdateTodoInput.java`
+- **Configuration**: `/src/main/java/.../config/GraphQLConfig.java`
+
+### cURL Examples
+
+**Get all todos**:
+```bash
+curl -X POST http://localhost:6060/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"query { todos { id title description completed } }"}'
+```
+
+**Create todo**:
+```bash
+curl -X POST http://localhost:6060/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { createTodo(input: { title: \"New Todo\" description: \"Test\" }) { id title completed } }"}'
+```
+
+### Key Points
+- GraphQL endpoint is **public** (no authentication required)
+- Resolvers delegate to `TodoService` which handles MongoDB persistence
+- Both GraphQL and REST `/api/todos/*` endpoints operate on the same data
+- GraphiQL UI at `/graphiql` provides interactive schema exploration and testing
+- See `GRAPHQL_TESTING_GUIDE.md` for comprehensive examples and usage patterns
+
+
 
 ### S3 Service Methods
 The `S3Service` provides core file operations:

@@ -17,7 +17,7 @@ public class SqsConfig {
     @Bean
     public SqsClient sqsClient(
             @Value("${aws.sqs.region}") String region,
-            @Value("${aws.sqs.endpoint:}") String endpoint,
+            @Value("${aws.sqs.endpoint:http://localhost:4566}") String endpoint,
             @Value("${aws.sqs.access-key:test}") String accessKey,
             @Value("${aws.sqs.secret-key:test}") String secretKey) {
         SqsClientBuilder builder = SqsClient.builder()
